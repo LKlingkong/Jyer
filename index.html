@@ -1,0 +1,1888 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>静心自律 - 科学行为管理助手</title>
+<style>
+:root {
+  --primary: #4A90D9;
+  --primary-light: #6BA5E7;
+  --primary-dark: #3A70B0;
+  --accent: #00B4D8;
+  --success: #2ECC71;
+  --warning: #F39C12;
+  --danger: #E74C3C;
+  --bg: #F0F4F8;
+  --card: #FFFFFF;
+  --text: #2C3E50;
+  --text-light: #7F8C8D;
+  --border: #E0E6ED;
+  --shadow: 0 2px 12px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 30px rgba(0,0,0,0.12);
+  --radius: 16px;
+  --radius-sm: 10px;
+  --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  background: linear-gradient(135deg, #E8F0FE 0%, #F0F4F8 30%, #E8F4F8 60%, #F0F4F8 100%);
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+.app-container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Header */
+.header {
+  text-align: center;
+  padding: 30px 20px 20px;
+  position: relative;
+}
+
+.header .logo {
+  font-size: 42px;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.header h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--primary-dark);
+  letter-spacing: 1px;
+}
+
+.header .subtitle {
+  font-size: 14px;
+  color: var(--text-light);
+  margin-top: 4px;
+  letter-spacing: 2px;
+}
+
+/* Tab Navigation */
+.tab-nav {
+  display: flex;
+  background: var(--card);
+  border-radius: 14px;
+  padding: 5px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow);
+  overflow-x: auto;
+  gap: 2px;
+}
+
+.tab-btn {
+  flex: 1;
+  min-width: 70px;
+  padding: 12px 8px;
+  border: none;
+  background: transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text-light);
+  transition: var(--transition);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.tab-btn .tab-icon { font-size: 20px; }
+.tab-btn:hover { background: var(--bg); color: var(--text); }
+.tab-btn.active { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(74,144,217,0.3); }
+
+/* Panels */
+.panel { display: none; animation: fadeSlideIn 0.4s ease; }
+.panel.active { display: block; }
+
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Cards */
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+}
+
+.card:hover { box-shadow: var(--shadow-lg); }
+
+.card-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-title .icon { font-size: 22px; }
+
+/* Dashboard Stats */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.stat-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 22px 20px;
+  text-align: center;
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+}
+
+.stat-card.streak::before { background: linear-gradient(90deg, #FF6B6B, #FF8E53); }
+.stat-card.days::before { background: linear-gradient(90deg, #4A90D9, #00B4D8); }
+.stat-card.goal::before { background: linear-gradient(90deg, #2ECC71, #27AE60); }
+.stat-card.record::before { background: linear-gradient(90deg, #9B59B6, #8E44AD); }
+
+.stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+
+.stat-value {
+  font-size: 42px;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.stat-card.streak .stat-value {
+  background: linear-gradient(135deg, #FF6B6B, #FF8E53);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.stat-label { font-size: 13px; color: var(--text-light); margin-top: 4px; }
+
+/* Progress Ring */
+.progress-ring-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 30px;
+  flex-wrap: wrap;
+}
+
+.progress-ring-wrapper { position: relative; width: 160px; height: 160px; }
+.progress-ring-wrapper svg { transform: rotate(-90deg); }
+
+.progress-ring-text {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.progress-ring-text .percent { font-size: 32px; font-weight: 800; color: var(--primary); }
+.progress-ring-text .label { font-size: 12px; color: var(--text-light); }
+
+.progress-info { flex: 1; min-width: 200px; }
+.progress-info .milestone { 
+  padding: 10px 14px; 
+  background: var(--bg); 
+  border-radius: 10px; 
+  margin-bottom: 8px;
+  font-size: 14px;
+  display: flex;
+  justify-content: space-between;
+  transition: var(--transition);
+}
+
+.progress-info .milestone.reached {
+  background: #E8F8F0;
+  border-left: 4px solid var(--success);
+}
+
+.progress-info .milestone.next {
+  background: #FEF9E7;
+  border-left: 4px solid var(--warning);
+}
+
+/* Daily Check-in */
+.checkin-quote {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 24px;
+  border-radius: var(--radius);
+  text-align: center;
+  margin-bottom: 16px;
+  font-size: 16px;
+  line-height: 1.8;
+  position: relative;
+}
+
+.checkin-quote .quote-mark {
+  font-size: 60px;
+  position: absolute;
+  top: 0; left: 16px;
+  opacity: 0.2;
+  line-height: 1;
+}
+
+.checkin-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+.checkin-actions button { flex: 1; min-width: 150px; }
+
+/* Buttons */
+.btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  letter-spacing: 0.5px;
+}
+
+.btn:active { transform: scale(0.97); }
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  box-shadow: 0 4px 15px rgba(74,144,217,0.3);
+}
+
+.btn-primary:hover {
+  box-shadow: 0 6px 20px rgba(74,144,217,0.45);
+  transform: translateY(-1px);
+}
+
+.btn-success {
+  background: linear-gradient(135deg, #2ECC71, #27AE60);
+  color: white;
+  box-shadow: 0 4px 15px rgba(46,204,113,0.3);
+}
+
+.btn-success:hover {
+  box-shadow: 0 6px 20px rgba(46,204,113,0.45);
+  transform: translateY(-1px);
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, #E74C3C, #C0392B);
+  color: white;
+  box-shadow: 0 4px 15px rgba(231,76,60,0.3);
+}
+
+.btn-outline {
+  background: white;
+  color: var(--primary);
+  border: 2px solid var(--primary);
+}
+
+.btn-outline:hover { background: var(--primary); color: white; }
+
+.btn-lg { padding: 16px 32px; font-size: 18px; border-radius: 14px; }
+
+.btn-block { width: 100%; }
+
+/* Calendar Heatmap */
+.heatmap-container { overflow-x: auto; padding: 10px 0; }
+.heatmap-grid { display: flex; gap: 4px; }
+.heatmap-week { display: flex; flex-direction: column; gap: 4px; }
+.heatmap-day {
+  width: 14px; height: 14px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: var(--transition);
+  position: relative;
+}
+.heatmap-day:hover {
+  transform: scale(1.5);
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+.heatmap-day.level-0 { background: #EBEDF0; }
+.heatmap-day.level-1 { background: #C6E48B; }
+.heatmap-day.level-2 { background: #7BC96F; }
+.heatmap-day.level-3 { background: #239A3B; }
+.heatmap-day.level-4 { background: #196127; }
+.heatmap-day.reset { background: #FF6B6B; }
+
+.heatmap-legend {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 12px;
+  font-size: 12px;
+  color: var(--text-light);
+}
+
+/* Urge Surfing Timer */
+.timer-display {
+  text-align: center;
+  padding: 40px 20px;
+  background: linear-gradient(135deg, #1A1A2E, #16213E);
+  border-radius: var(--radius);
+  color: white;
+  margin-bottom: 16px;
+}
+
+.timer-time {
+  font-size: 72px;
+  font-weight: 200;
+  font-family: 'SF Mono', 'Consolas', 'Monaco', monospace;
+  letter-spacing: 6px;
+}
+
+.timer-label { font-size: 14px; color: rgba(255,255,255,0.6); margin-top: 8px; letter-spacing: 2px; }
+
+.timer-controls { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+.timer-info {
+  background: var(--card);
+  border-left: 4px solid var(--primary);
+  padding: 16px 20px;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  margin-bottom: 16px;
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.8;
+}
+
+/* Psychology Library */
+.knowledge-item {
+  background: var(--card);
+  border-radius: var(--radius-sm);
+  padding: 18px 20px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: var(--transition);
+  border-left: 4px solid transparent;
+}
+
+.knowledge-item:hover {
+  border-left-color: var(--primary);
+  box-shadow: var(--shadow);
+}
+
+.knowledge-item.active {
+  border-left-color: var(--primary);
+  background: #F0F7FF;
+}
+
+.knowledge-item .ki-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.knowledge-item .ki-preview {
+  font-size: 13px;
+  color: var(--text-light);
+  line-height: 1.5;
+}
+
+.knowledge-detail {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 28px;
+  line-height: 1.9;
+  font-size: 15px;
+}
+
+.knowledge-detail h3 {
+  color: var(--primary-dark);
+  margin-bottom: 16px;
+  font-size: 20px;
+}
+
+.knowledge-detail .highlight-box {
+  background: #F0F7FF;
+  border-left: 4px solid var(--primary);
+  padding: 14px 18px;
+  border-radius: 0 10px 10px 0;
+  margin: 16px 0;
+  font-size: 14px;
+}
+
+/* Achievement */
+.achievement-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 12px;
+}
+
+.achievement-item {
+  background: var(--card);
+  border-radius: var(--radius-sm);
+  padding: 20px 12px;
+  text-align: center;
+  transition: var(--transition);
+  border: 2px solid transparent;
+}
+
+.achievement-item.unlocked {
+  border-color: var(--success);
+  background: #F0FFF4;
+}
+
+.achievement-item.locked {
+  opacity: 0.5;
+  filter: grayscale(100%);
+}
+
+.achievement-icon { font-size: 36px; margin-bottom: 8px; }
+.achievement-name { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+.achievement-desc { font-size: 11px; color: var(--text-light); }
+
+/* Analytics */
+.chart-container {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.chart-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.chart-bar-label {
+  width: 80px;
+  font-size: 13px;
+  text-align: right;
+  color: var(--text-light);
+}
+
+.chart-bar-track {
+  flex: 1;
+  height: 28px;
+  background: var(--bg);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.chart-bar-fill {
+  height: 100%;
+  border-radius: 14px;
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  padding-left: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: white;
+  min-width: 40px;
+}
+
+/* Emergency SOS */
+.sos-card {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.sos-card .sos-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.sos-card .sos-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--danger);
+  margin-bottom: 8px;
+}
+
+.sos-steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.sos-step {
+  background: var(--card);
+  border-radius: var(--radius-sm);
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: var(--transition);
+  border: 2px solid transparent;
+}
+
+.sos-step:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+
+.sos-step .step-num {
+  width: 36px; height: 36px;
+  background: var(--primary);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  margin: 0 auto 10px;
+}
+
+.sos-step .step-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+.sos-step .step-desc { font-size: 12px; color: var(--text-light); }
+
+/* Modal */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-overlay.show { display: flex; }
+
+.modal {
+  background: white;
+  border-radius: var(--radius);
+  padding: 30px;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: var(--shadow-lg);
+  animation: fadeSlideIn 0.3s ease;
+}
+
+.modal h3 { margin-bottom: 16px; color: var(--text); }
+.modal textarea {
+  width: 100%;
+  min-height: 100px;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 14px;
+  resize: vertical;
+  font-family: inherit;
+}
+.modal textarea:focus { outline: none; border-color: var(--primary); }
+.modal .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 16px; }
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--text);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 30px;
+  font-size: 14px;
+  font-weight: 600;
+  z-index: 2000;
+  animation: toastIn 0.4s ease, toastOut 0.4s ease 2s forwards;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+}
+
+@keyframes toastIn { from { opacity: 0; transform: translateX(-50%) translateY(20px); } }
+@keyframes toastOut { to { opacity: 0; transform: translateX(-50%) translateY(20px); } }
+
+/* Confetti */
+.confetti-piece {
+  position: fixed;
+  z-index: 3000;
+  pointer-events: none;
+  animation: confettiFall 3s ease-in forwards;
+}
+
+@keyframes confettiFall {
+  0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .app-container { padding: 10px; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .stat-value { font-size: 30px; }
+  .timer-time { font-size: 48px; }
+  .tab-btn { font-size: 11px; padding: 10px 6px; }
+  .tab-btn .tab-icon { font-size: 16px; }
+}
+
+/* Footer */
+.footer {
+  text-align: center;
+  padding: 20px;
+  color: var(--text-light);
+  font-size: 12px;
+}
+</style>
+</head>
+<body>
+
+<div class="app-container">
+  <!-- Header -->
+  <div class="header">
+    <span class="logo">🧘</span>
+    <h1>静心自律</h1>
+    <p class="subtitle">—— 科学行为管理 · 重塑自由意志 ——</p>
+  </div>
+
+  <!-- Tab Navigation -->
+  <nav class="tab-nav" id="tabNav">
+    <button class="tab-btn active" data-tab="dashboard">
+      <span class="tab-icon">📊</span> 仪表盘
+    </button>
+    <button class="tab-btn" data-tab="checkin">
+      <span class="tab-icon">✅</span> 每日打卡
+    </button>
+    <button class="tab-btn" data-tab="calendar">
+      <span class="tab-icon">📅</span> 记录日历
+    </button>
+    <button class="tab-btn" data-tab="timer">
+      <span class="tab-icon">⏱️</span> 冲动冲浪
+    </button>
+    <button class="tab-btn" data-tab="sos">
+      <span class="tab-icon">🆘</span> 紧急应对
+    </button>
+    <button class="tab-btn" data-tab="knowledge">
+      <span class="tab-icon">📚</span> 心理学库
+    </button>
+    <button class="tab-btn" data-tab="achievements">
+      <span class="tab-icon">🏆</span> 成就
+    </button>
+    <button class="tab-btn" data-tab="analytics">
+      <span class="tab-icon">📈</span> 分析
+    </button>
+  </nav>
+
+  <!-- ========== 仪表盘 ========== -->
+  <div class="panel active" id="panel-dashboard">
+    <!-- 统计卡片 -->
+    <div class="stats-grid">
+      <div class="stat-card streak">
+        <div class="stat-value" id="currentStreak">0</div>
+        <div class="stat-label">🔥 当前连续天数</div>
+      </div>
+      <div class="stat-card days">
+        <div class="stat-value" id="totalCleanDays">0</div>
+        <div class="stat-label">📆 累计自律天数</div>
+      </div>
+      <div class="stat-card goal">
+        <div class="stat-value" id="goalProgress">0%</div>
+        <div class="stat-label">🎯 目标完成度</div>
+      </div>
+      <div class="stat-card record">
+        <div class="stat-value" id="bestStreak">0</div>
+        <div class="stat-label">⭐ 最佳记录</div>
+      </div>
+    </div>
+
+    <!-- 进度环 + 里程碑 -->
+    <div class="card">
+      <div class="progress-ring-container">
+        <div class="progress-ring-wrapper">
+          <svg width="160" height="160" viewBox="0 0 160 160">
+            <circle cx="80" cy="80" r="70" fill="none" stroke="#EBEDF0" stroke-width="12"/>
+            <circle cx="80" cy="80" r="70" fill="none" stroke="url(#ringGradient)" stroke-width="12"
+              stroke-linecap="round" id="progressRing"
+              stroke-dasharray="439.8" stroke-dashoffset="439.8"/>
+            <defs>
+              <linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#4A90D9"/>
+                <stop offset="100%" style="stop-color:#00B4D8"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <div class="progress-ring-text">
+            <div class="percent" id="progressPercent">0%</div>
+            <div class="label">目标进度</div>
+          </div>
+        </div>
+        <div class="progress-info" id="milestoneList"></div>
+      </div>
+    </div>
+
+    <!-- 每日金句 -->
+    <div class="checkin-quote" id="dailyQuote">
+      <span class="quote-mark">"</span>
+      <span id="quoteText">自律不是自虐，而是给未来的自己最好的礼物。</span>
+    </div>
+
+    <!-- 快捷操作 -->
+    <div style="display:flex;gap:12px;flex-wrap:wrap;">
+      <button class="btn btn-success btn-lg" style="flex:2;min-width:200px;" onclick="switchTab('checkin')">
+        ✅ 今日打卡签到
+      </button>
+      <button class="btn btn-outline btn-lg" style="flex:1;min-width:150px;" onclick="switchTab('timer')">
+        ⏱️ 开始冲动冲浪
+      </button>
+    </div>
+  </div>
+
+  <!-- ========== 每日打卡 ========== -->
+  <div class="panel" id="panel-checkin">
+    <div class="card">
+      <div class="card-title"><span class="icon">✅</span> 每日自律打卡</div>
+      <div class="checkin-quote" id="checkinQuote">
+        <span class="quote-mark">"</span>
+        <span id="checkinQuoteText">每一天的坚持，都是在重塑你的大脑神经回路。</span>
+      </div>
+      
+      <div id="todayStatus" style="text-align:center;padding:20px;">
+        <div style="font-size:60px;margin-bottom:12px;">🌅</div>
+        <div style="font-size:18px;font-weight:600;color:var(--text);" id="todayStatusText">今天尚未打卡</div>
+        <div style="font-size:13px;color:var(--text-light);margin-top:4px;" id="todayStatusSub"></div>
+      </div>
+
+      <div class="checkin-actions">
+        <button class="btn btn-success btn-lg" id="btnCleanDay" onclick="checkinClean()">
+          🌟 打卡：今日自律成功
+        </button>
+        <button class="btn btn-danger" id="btnResetDay" onclick="checkinReset()">
+          ⚠️ 记录破戒（诚实面对）
+        </button>
+      </div>
+    </div>
+
+    <!-- 日记 -->
+    <div class="card">
+      <div class="card-title"><span class="icon">📝</span> 今日反思日记</div>
+      <textarea id="journalInput" placeholder="今天有什么触发因素？你是如何应对的？学到了什么？..." style="width:100%;min-height:120px;border:2px solid var(--border);border-radius:10px;padding:14px;font-size:14px;font-family:inherit;resize:vertical;"></textarea>
+      <button class="btn btn-primary" style="margin-top:12px;width:100%;" onclick="saveJournal()">💾 保存日记</button>
+    </div>
+  </div>
+
+  <!-- ========== 日历热力图 ========== -->
+  <div class="panel" id="panel-calendar">
+    <div class="card">
+      <div class="card-title"><span class="icon">📅</span> 自律日历 — 365天可视化</div>
+      <div class="heatmap-container">
+        <div class="heatmap-grid" id="heatmapGrid"></div>
+      </div>
+      <div class="heatmap-legend">
+        <span>少 →</span>
+        <span class="heatmap-day level-0" style="display:inline-block;"></span>
+        <span class="heatmap-day level-1" style="display:inline-block;"></span>
+        <span class="heatmap-day level-2" style="display:inline-block;"></span>
+        <span class="heatmap-day level-3" style="display:inline-block;"></span>
+        <span class="heatmap-day level-4" style="display:inline-block;"></span>
+        <span>→ 多（连续天数）</span>
+        <span class="heatmap-day reset" style="display:inline-block;margin-left:16px;"></span>
+        <span>破戒日</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 冲动冲浪计时器 ========== -->
+  <div class="panel" id="panel-timer">
+    <div class="card">
+      <div class="card-title"><span class="icon">⏱️</span> 冲动冲浪（Urge Surfing）</div>
+      <div class="timer-info">
+        <strong>🧠 科学原理：</strong>神经科学研究表明，一次冲动的峰值持续时间通常只有 <strong>10-20 分钟</strong>。
+        通过正念观察而非对抗冲动，你可以在不行动的情况下让冲动自然消退。
+        这就是"冲动冲浪"——像冲浪者一样骑在浪头上，而不被浪潮淹没。
+      </div>
+
+      <div class="timer-display">
+        <div class="timer-time" id="timerDisplay">05:00</div>
+        <div class="timer-label" id="timerStatus">准备开始 — 默认 5 分钟</div>
+      </div>
+
+      <div class="timer-controls">
+        <button class="btn btn-primary" onclick="startTimer()" id="btnTimerStart">▶ 开始冲浪</button>
+        <button class="btn btn-outline" onclick="pauseTimer()" id="btnTimerPause" style="display:none;">⏸ 暂停</button>
+        <button class="btn btn-outline" onclick="resetTimer()">🔄 重置</button>
+      </div>
+
+      <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center;">
+        <button class="btn btn-outline" onclick="setTimerDuration(300)" style="font-size:13px;">5分钟</button>
+        <button class="btn btn-outline" onclick="setTimerDuration(600)" style="font-size:13px;">10分钟</button>
+        <button class="btn btn-outline" onclick="setTimerDuration(1200)" style="font-size:13px;">20分钟</button>
+        <button class="btn btn-outline" onclick="setTimerDuration(1800)" style="font-size:13px;">30分钟</button>
+      </div>
+    </div>
+
+    <!-- 计时中的引导语 -->
+    <div class="card" id="breathingGuide" style="display:none;">
+      <div class="card-title"><span class="icon">🧘</span> 呼吸引导</div>
+      <div style="text-align:center;padding:30px;font-size:24px;" id="breathingText">
+        吸气... 4秒
+      </div>
+      <div style="text-align:center;">
+        <div style="width:80px;height:80px;border-radius:50%;background:var(--primary);margin:0 auto;
+          transition: transform 4s ease-in-out;animation: breatheAnim 8s ease-in-out infinite;
+          opacity:0.3;" id="breathingCircle"></div>
+      </div>
+      <style>
+        @keyframes breatheAnim {
+          0%, 100% { transform: scale(0.6); }
+          50% { transform: scale(1.8); }
+        }
+      </style>
+    </div>
+  </div>
+
+  <!-- ========== 紧急应对 ========== -->
+  <div class="panel" id="panel-sos">
+    <div class="sos-card card">
+      <div class="sos-icon">🆘</div>
+      <div class="sos-title">感到冲动来袭？试试这些方法</div>
+      <p style="color:var(--text-light);margin-bottom:20px;">选择一个，立刻行动起来——冲动的高峰只有几分钟</p>
+
+      <div class="sos-steps">
+        <div class="sos-step" onclick="switchTab('timer')">
+          <div class="step-num">1</div>
+          <div class="step-title">⏱️ 冲动冲浪</div>
+          <div class="step-desc">正念观察，让冲动自然消退</div>
+        </div>
+        <div class="sos-step" onclick="doPushups()">
+          <div class="step-num">2</div>
+          <div class="step-title">💪 立即运动</div>
+          <div class="step-desc" id="pushupCount">做20个俯卧撑</div>
+        </div>
+        <div class="sos-step" onclick="doColdShower()">
+          <div class="step-num">3</div>
+          <div class="step-title">🚿 冷水洗脸</div>
+          <div class="step-desc">刺激迷走神经，迅速冷静</div>
+        </div>
+        <div class="sos-step" onclick="doDistraction()">
+          <div class="step-num">4</div>
+          <div class="step-title">🎯 转移注意力</div>
+          <div class="step-desc" id="distractionTask">打开推荐任务</div>
+        </div>
+        <div class="sos-step" onclick="doBreathing()">
+          <div class="step-num">5</div>
+          <div class="step-title">🌬️ 4-7-8呼吸法</div>
+          <div class="step-desc">吸气4秒，屏息7秒，呼气8秒</div>
+        </div>
+        <div class="sos-step" onclick="doJournalUrge()">
+          <div class="step-num">6</div>
+          <div class="step-title">📝 冲动日志</div>
+          <div class="step-desc">记录触发因素和感受</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 心理学知识库 ========== -->
+  <div class="panel" id="panel-knowledge">
+    <div id="knowledgeList"></div>
+    <div class="knowledge-detail" id="knowledgeDetail" style="display:none;"></div>
+  </div>
+
+  <!-- ========== 成就系统 ========== -->
+  <div class="panel" id="panel-achievements">
+    <div class="card">
+      <div class="card-title"><span class="icon">🏆</span> 成就徽章</div>
+      <div class="achievement-grid" id="achievementGrid"></div>
+    </div>
+  </div>
+
+  <!-- ========== 数据分析 ========== -->
+  <div class="panel" id="panel-analytics">
+    <div class="card">
+      <div class="card-title"><span class="icon">📈</span> 月度趋势</div>
+      <div id="monthlyChart"></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="icon">📊</span> 统计概览</div>
+      <div id="statsOverview"></div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <p>静心自律 v1.0 — 基于认知行为疗法(CBT)与正念的科学工具</p>
+    <p style="margin-top:4px;">每一次克制，都是大脑神经可塑性的正向重塑 🧠</p>
+  </div>
+</div>
+
+<!-- 冲动日志 Modal -->
+<div class="modal-overlay" id="urgeModal">
+  <div class="modal">
+    <h3>📝 记录这次冲动</h3>
+    <p style="font-size:13px;color:var(--text-light);margin-bottom:12px;">诚实地记录有助于识别触发模式</p>
+    <label style="font-size:13px;font-weight:600;">触发因素：</label>
+    <input type="text" id="urgeTrigger" placeholder="例如：看到社交媒体图片、压力大、无聊..." style="width:100%;padding:10px;border:2px solid var(--border);border-radius:8px;margin-bottom:12px;font-size:14px;">
+    <label style="font-size:13px;font-weight:600;">冲动强度 (1-10)：</label>
+    <input type="range" id="urgeIntensity" min="1" max="10" value="5" style="width:100%;margin-bottom:12px;">
+    <div style="text-align:center;font-size:20px;font-weight:700;color:var(--danger);" id="intensityDisplay">5</div>
+    <label style="font-size:13px;font-weight:600;">感受与应对：</label>
+    <textarea id="urgeNotes" placeholder="描述你的感受..."></textarea>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeUrgeModal()">取消</button>
+      <button class="btn btn-primary" onclick="saveUrgeLog()">💾 保存</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ==================== 数据管理 ====================
+const STORAGE_KEY = 'quiet_mind_habit_data';
+const DEFAULT_DATA = {
+  goal: 90,                    // 默认目标90天
+  cleanDays: {},              // { 'YYYY-MM-DD': true } 自律日期
+  resetDays: {},              // { 'YYYY-MM-DD': true } 破戒日期
+  journals: {},               // { 'YYYY-MM-DD': '日记内容' }
+  urgeLogs: [],               // [{ date, trigger, intensity, notes }]
+  streakStart: null,          // 当前连续开始日期
+  achievements: {},           // { achievementId: true }
+  lastCheckin: null,          // 最后打卡日期
+};
+
+function loadData() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return { ...DEFAULT_DATA, ...JSON.parse(raw) };
+  } catch(e) {}
+  return { ...DEFAULT_DATA };
+}
+
+function saveData(data) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+
+let appData = loadData();
+
+// ==================== 工具函数 ====================
+function todayStr() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+function daysBetween(d1, d2) {
+  return Math.floor((new Date(d1) - new Date(d2)) / 86400000);
+}
+
+function showToast(msg) {
+  const existing = document.querySelector('.toast');
+  if (existing) existing.remove();
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.textContent = msg;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 2500);
+}
+
+function showConfetti() {
+  const colors = ['#FF6B6B','#FFD93D','#6BCB77','#4D96FF','#FF8E53','#C084FC'];
+  for (let i = 0; i < 60; i++) {
+    setTimeout(() => {
+      const piece = document.createElement('div');
+      piece.className = 'confetti-piece';
+      piece.style.left = Math.random() * 100 + '%';
+      piece.style.background = colors[Math.floor(Math.random()*colors.length)];
+      piece.style.width = (Math.random()*10+5) + 'px';
+      piece.style.height = (Math.random()*10+5) + 'px';
+      piece.style.borderRadius = Math.random()>0.5?'50%':'2px';
+      piece.style.animationDuration = (Math.random()*2+2) + 's';
+      piece.style.animationDelay = Math.random()*0.5 + 's';
+      document.body.appendChild(piece);
+      setTimeout(() => piece.remove(), 3500);
+    }, i * 30);
+  }
+}
+
+// ==================== 导航 ====================
+function switchTab(tabName) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  const btn = document.querySelector(`[data-tab="${tabName}"]`);
+  if (btn) btn.classList.add('active');
+  const panel = document.getElementById(`panel-${tabName}`);
+  if (panel) panel.classList.add('active');
+  
+  // 切换时刷新对应面板
+  if (tabName === 'dashboard') refreshDashboard();
+  if (tabName === 'calendar') refreshCalendar();
+  if (tabName === 'achievements') refreshAchievements();
+  if (tabName === 'analytics') refreshAnalytics();
+  if (tabName === 'checkin') refreshCheckin();
+}
+
+document.getElementById('tabNav').addEventListener('click', (e) => {
+  const btn = e.target.closest('.tab-btn');
+  if (btn) switchTab(btn.dataset.tab);
+});
+
+// ==================== 金句系统 ====================
+const quotes = [
+  "自律不是自虐，而是给未来的自己最好的礼物。",
+  "每一次克制，都在重塑你大脑的神经回路。",
+  "自由不是想做什么就做什么，而是有能力不做不想做的事。",
+  "冲动是暂时的浪花，自律是永恒的海洋。",
+  "你不是你的冲动，你是观察冲动的那份觉知。",
+  "21天养成一个习惯，90天改变一种人生。",
+  "真正的力量不是压倒一切，而是不被一切压倒。",
+  "你的大脑是可塑的——每次选择都在塑造未来的你。",
+  "欲望来了又走，但你始终是你。",
+  "战胜自己，是最高级的胜利。——亚里士多德",
+  "人不是被欲望控制的动物，而是有选择能力的存在。",
+  "最深的自由，来自于对自我冲动的掌控。",
+  "每一次说不，都是对真实自我说一声是。",
+  "你不是在失去什么，你是在赢回你自己。",
+  "习惯是自我提升的复利。——James Clear",
+];
+
+function getDailyQuote() {
+  const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(),0,0)) / 86400000);
+  return quotes[dayOfYear % quotes.length];
+}
+
+// ==================== 成就定义 ====================
+const achievementDefs = [
+  { id: 'first_day', name: '第一步', desc: '完成首次自律打卡', icon: '🌱', condition: (d) => Object.keys(d.cleanDays).length >= 1 },
+  { id: 'streak_3', name: '三天之约', desc: '连续自律3天', icon: '🌿', condition: (d) => getCurrentStreak(d) >= 3 },
+  { id: 'streak_7', name: '一周勇士', desc: '连续自律7天', icon: '⭐', condition: (d) => getCurrentStreak(d) >= 7 },
+  { id: 'streak_14', name: '双周战神', desc: '连续自律14天', icon: '🌟', condition: (d) => getCurrentStreak(d) >= 14 },
+  { id: 'streak_21', name: '习惯初成', desc: '连续自律21天', icon: '🔥', condition: (d) => getCurrentStreak(d) >= 21 },
+  { id: 'streak_30', name: '月度冠军', desc: '连续自律30天', icon: '💎', condition: (d) => getCurrentStreak(d) >= 30 },
+  { id: 'streak_60', name: '双月战神', desc: '连续自律60天', icon: '👑', condition: (d) => getCurrentStreak(d) >= 60 },
+  { id: 'streak_90', name: '涅槃重生', desc: '连续自律90天', icon: '🦅', condition: (d) => getCurrentStreak(d) >= 90 },
+  { id: 'streak_180', name: '半载修行', desc: '连续自律180天', icon: '🏔️', condition: (d) => getCurrentStreak(d) >= 180 },
+  { id: 'streak_365', name: '一年传奇', desc: '连续自律365天', icon: '🏆', condition: (d) => getCurrentStreak(d) >= 365 },
+  { id: 'journal_7', name: '反思者', desc: '写了7篇日记', icon: '📝', condition: (d) => Object.keys(d.journals).length >= 7 },
+  { id: 'journal_30', name: '深度思考者', desc: '写了30篇日记', icon: '📖', condition: (d) => Object.keys(d.journals).length >= 30 },
+  { id: 'urge_10', name: '冲动记录员', desc: '记录了10次冲动日志', icon: '📊', condition: (d) => d.urgeLogs.length >= 10 },
+  { id: 'timer_10', name: '冲浪达人', desc: '完成10次冲动冲浪', icon: '🏄', condition: (d) => (d.timerCompleted || 0) >= 10 },
+  { id: 'total_30', name: '月之光', desc: '累计自律30天', icon: '🌙', condition: (d) => Object.keys(d.cleanDays).length >= 30 },
+  { id: 'total_100', name: '百炼成钢', desc: '累计自律100天', icon: '⚡', condition: (d) => Object.keys(d.cleanDays).length >= 100 },
+];
+
+function getCurrentStreak(data) {
+  const today = todayStr();
+  if (data.resetDays[today]) return 0;
+  
+  let streak = 0;
+  let check = new Date(today);
+  
+  // 如果今天还没打卡，从前一天开始数
+  if (!data.cleanDays[today]) {
+    check = new Date(check.getTime() - 86400000);
+  }
+  
+  while (true) {
+    const ds = `${check.getFullYear()}-${String(check.getMonth()+1).padStart(2,'0')}-${String(check.getDate()).padStart(2,'0')}`;
+    if (data.cleanDays[ds] && !data.resetDays[ds]) {
+      streak++;
+      check = new Date(check.getTime() - 86400000);
+    } else {
+      break;
+    }
+  }
+  return streak;
+}
+
+// ==================== 仪表盘 ====================
+function refreshDashboard() {
+  appData = loadData();
+  const streak = getCurrentStreak(appData);
+  const totalClean = Object.keys(appData.cleanDays).length;
+  const goalProgress = appData.goal > 0 ? Math.round((streak / appData.goal) * 100) : 0;
+  const best = appData.bestStreak || 0;
+  const newBest = Math.max(best, streak);
+  if (newBest > best) {
+    appData.bestStreak = newBest;
+    saveData(appData);
+  }
+
+  document.getElementById('currentStreak').textContent = streak;
+  document.getElementById('totalCleanDays').textContent = totalClean;
+  document.getElementById('goalProgress').textContent = goalProgress + '%';
+  document.getElementById('bestStreak').textContent = appData.bestStreak || 0;
+
+  // 进度环
+  const circumference = 439.8;
+  const progress = Math.min(goalProgress, 100);
+  const offset = circumference * (1 - progress / 100);
+  document.getElementById('progressRing').setAttribute('stroke-dashoffset', offset);
+  document.getElementById('progressPercent').textContent = progress + '%';
+
+  // 里程碑
+  const milestones = [3, 7, 14, 21, 30, 60, 90, 180, 365];
+  const milestoneList = document.getElementById('milestoneList');
+  milestoneList.innerHTML = milestones.map(m => {
+    const reached = streak >= m;
+    const cls = reached ? 'reached' : (m === milestones.find(x => x > streak) ? 'next' : '');
+    return `<div class="milestone ${cls}">
+      <span>${reached?'✅':'🔒'} ${m}天</span>
+      <span>${reached?'已达成':(streak>0?`还需${m-streak}天`:'')}</span>
+    </div>`;
+  }).join('');
+
+  // 每日金句
+  document.getElementById('quoteText').textContent = getDailyQuote();
+}
+
+// ==================== 每日打卡 ====================
+function refreshCheckin() {
+  appData = loadData();
+  const today = todayStr();
+  const statusEl = document.getElementById('todayStatus');
+  const statusText = document.getElementById('todayStatusText');
+  const statusSub = document.getElementById('todayStatusSub');
+
+  if (appData.cleanDays[today] && !appData.resetDays[today]) {
+    statusEl.querySelector('div:first-child').textContent = '🌟';
+    statusText.textContent = '今天已打卡 —— 你做得很棒！';
+    statusSub.textContent = `当前连续 ${getCurrentStreak(appData)} 天`;
+    document.getElementById('btnCleanDay').style.opacity = '0.5';
+    document.getElementById('btnCleanDay').disabled = true;
+  } else if (appData.resetDays[today]) {
+    statusEl.querySelector('div:first-child').textContent = '🔄';
+    statusText.textContent = '今天有过波折，但这不是终点';
+    statusSub.textContent = '诚实面对就是进步，明天重新开始';
+    document.getElementById('btnCleanDay').style.opacity = '1';
+    document.getElementById('btnCleanDay').disabled = false;
+  } else {
+    statusEl.querySelector('div:first-child').textContent = '🌅';
+    statusText.textContent = '今天尚未打卡';
+    statusSub.textContent = '新的一天，新的选择';
+    document.getElementById('btnCleanDay').style.opacity = '1';
+    document.getElementById('btnCleanDay').disabled = false;
+  }
+
+  document.getElementById('checkinQuoteText').textContent = getDailyQuote();
+  
+  // 加载今日日记
+  const journal = appData.journals[today] || '';
+  document.getElementById('journalInput').value = journal;
+}
+
+function checkinClean() {
+  appData = loadData();
+  const today = todayStr();
+  
+  if (appData.cleanDays[today] && !appData.resetDays[today]) {
+    showToast('今天已经打过卡了！🌿');
+    return;
+  }
+
+  appData.cleanDays[today] = true;
+  delete appData.resetDays[today];
+  appData.lastCheckin = today;
+  
+  const streak = getCurrentStreak(appData);
+  if (streak > (appData.bestStreak || 0)) {
+    appData.bestStreak = streak;
+  }
+
+  saveData(appData);
+  
+  // 检查成就
+  checkAndUnlockAchievements();
+  
+  showConfetti();
+  showToast(`打卡成功！连续 ${streak} 天 🔥`);
+  
+  // 特殊里程碑提示
+  if ([3,7,14,21,30,60,90,180,365].includes(streak)) {
+    setTimeout(() => showToast(`🎉 达成 ${streak} 天里程碑！`), 2500);
+  }
+
+  refreshDashboard();
+  refreshCheckin();
+  refreshAchievements();
+}
+
+function checkinReset() {
+  appData = loadData();
+  const today = todayStr();
+  
+  appData.resetDays[today] = true;
+  appData.lastCheckin = today;
+  
+  // 统计连续天数（破戒前）
+  const oldStreak = getCurrentStreak(appData);
+  
+  saveData(appData);
+  showToast('已记录。诚实面对是第一步，重新出发吧 💪');
+  refreshDashboard();
+  refreshCheckin();
+  
+  // 弹出冲动日志
+  document.getElementById('urgeModal').classList.add('show');
+}
+
+function saveJournal() {
+  appData = loadData();
+  const today = todayStr();
+  const content = document.getElementById('journalInput').value.trim();
+  if (content) {
+    appData.journals[today] = content;
+    saveData(appData);
+    showToast('日记已保存 📝');
+    checkAndUnlockAchievements();
+    refreshAchievements();
+  }
+}
+
+// ==================== 日历热力图 ====================
+function refreshCalendar() {
+  appData = loadData();
+  const grid = document.getElementById('heatmapGrid');
+  const weeks = 53;
+  const today = new Date();
+  // 找到本周日作为结束
+  const endDate = new Date(today);
+  const dayOfWeek = endDate.getDay();
+  endDate.setDate(endDate.getDate() + (dayOfWeek === 0 ? 0 : 7 - dayOfWeek));
+  
+  // 从结束日期往回推53周
+  const startDate = new Date(endDate);
+  startDate.setDate(startDate.getDate() - weeks * 7 + 1);
+  
+  // 构建连续天数计算
+  const streakMap = {};
+  let runningStreak = 0;
+  for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate()+1)) {
+    const ds = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    if (appData.cleanDays[ds] && !appData.resetDays[ds]) {
+      runningStreak++;
+    } else {
+      runningStreak = 0;
+    }
+    streakMap[ds] = runningStreak;
+  }
+  
+  // 渲染
+  let html = '';
+  let currentDate = new Date(startDate);
+  
+  // 调整到周日开始
+  currentDate.setDate(currentDate.getDate() - currentDate.getDay());
+  
+  const weekLabels = [];
+  const allDays = [];
+  
+  for (let w = 0; w < weeks; w++) {
+    const weekDays = [];
+    for (let d = 0; d < 7; d++) {
+      const ds = `${currentDate.getFullYear()}-${String(currentDate.getMonth()+1).padStart(2,'0')}-${String(currentDate.getDate()).padStart(2,'0')}`;
+      const isReset = !!appData.resetDays[ds];
+      const streakVal = streakMap[ds] || 0;
+      let level = 0;
+      if (!isReset && streakVal > 0) {
+        if (streakVal >= 30) level = 4;
+        else if (streakVal >= 14) level = 3;
+        else if (streakVal >= 7) level = 2;
+        else level = 1;
+      }
+      const cls = isReset ? 'reset' : `level-${level}`;
+      const title = `${ds}: ${isReset?'破戒日':(streakVal>0?`连续第${streakVal}天`:'无记录')}`;
+      weekDays.push(`<div class="heatmap-day ${cls}" title="${title}"></div>`);
+      
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+    allDays.push(weekDays);
+  }
+  
+  // 渲染为列（每周一列）
+  html = allDays.map(week => `<div class="heatmap-week">${week.join('')}</div>`).join('');
+  grid.innerHTML = html;
+}
+
+// ==================== 冲动冲浪计时器 ====================
+let timerInterval = null;
+let timerSeconds = 300;
+let timerRunning = false;
+let timerPaused = false;
+let timerCompleted = false;
+
+function updateTimerDisplay() {
+  const mins = Math.floor(timerSeconds / 60);
+  const secs = timerSeconds % 60;
+  document.getElementById('timerDisplay').textContent = 
+    `${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+}
+
+function setTimerDuration(seconds) {
+  if (timerRunning) return;
+  timerSeconds = seconds;
+  updateTimerDisplay();
+  document.getElementById('timerStatus').textContent = 
+    `准备开始 — 默认 ${Math.floor(seconds/60)} 分钟`;
+}
+
+function startTimer() {
+  if (timerRunning && !timerPaused) return;
+  
+  if (!timerPaused) {
+    timerCompleted = false;
+  }
+  
+  timerRunning = true;
+  timerPaused = false;
+  document.getElementById('btnTimerStart').style.display = 'none';
+  document.getElementById('btnTimerPause').style.display = 'inline-flex';
+  document.getElementById('timerStatus').textContent = '冲浪中...观察你的冲动，像海浪一样来又走 🌊';
+  document.getElementById('breathingGuide').style.display = 'block';
+  
+  timerInterval = setInterval(() => {
+    timerSeconds--;
+    updateTimerDisplay();
+    
+    // 呼吸引导
+    const phase = timerSeconds % 8;
+    const breathingEl = document.getElementById('breathingText');
+    if (phase < 4) {
+      breathingEl.textContent = '吸气... ' + (4-phase) + '秒';
+    } else if (phase < 7) {
+      breathingEl.textContent = '屏息... ' + (7-phase) + '秒';
+    } else {
+      breathingEl.textContent = '呼气... ' + (8-phase) + '秒';
+    }
+    
+    if (timerSeconds <= 0) {
+      completeTimer();
+    }
+  }, 1000);
+}
+
+function pauseTimer() {
+  if (!timerRunning) return;
+  timerPaused = true;
+  timerRunning = false;
+  clearInterval(timerInterval);
+  document.getElementById('btnTimerStart').style.display = 'inline-flex';
+  document.getElementById('btnTimerStart').textContent = '▶ 继续';
+  document.getElementById('btnTimerPause').style.display = 'none';
+  document.getElementById('timerStatus').textContent = '已暂停';
+}
+
+function resetTimer() {
+  clearInterval(timerInterval);
+  timerRunning = false;
+  timerPaused = false;
+  timerCompleted = false;
+  timerSeconds = 300;
+  updateTimerDisplay();
+  document.getElementById('btnTimerStart').style.display = 'inline-flex';
+  document.getElementById('btnTimerStart').textContent = '▶ 开始冲浪';
+  document.getElementById('btnTimerPause').style.display = 'none';
+  document.getElementById('timerStatus').textContent = '准备开始 — 默认 5 分钟';
+  document.getElementById('breathingGuide').style.display = 'none';
+}
+
+function completeTimer() {
+  clearInterval(timerInterval);
+  timerRunning = false;
+  timerCompleted = true;
+  
+  // 记录完成次数
+  appData = loadData();
+  appData.timerCompleted = (appData.timerCompleted || 0) + 1;
+  saveData(appData);
+  
+  document.getElementById('timerDisplay').textContent = '00:00';
+  document.getElementById('timerStatus').textContent = '🎉 冲浪成功！冲动已经消退';
+  document.getElementById('btnTimerStart').style.display = 'inline-flex';
+  document.getElementById('btnTimerStart').textContent = '🔄 再来一次';
+  document.getElementById('btnTimerPause').style.display = 'none';
+  document.getElementById('breathingGuide').style.display = 'none';
+  
+  showConfetti();
+  showToast('冲动冲浪完成！你做得很棒 🏄');
+  checkAndUnlockAchievements();
+  refreshAchievements();
+}
+
+// ==================== 紧急应对 ====================
+function doPushups() {
+  const count = Math.floor(Math.random() * 20) + 10;
+  document.getElementById('pushupCount').textContent = `做${count}个俯卧撑 ✓`;
+  showToast(`💪 去做 ${count} 个俯卧撑！运动释放内啡肽`);
+  setTimeout(() => {
+    document.getElementById('pushupCount').textContent = '做20个俯卧撑';
+  }, 3000);
+}
+
+function doColdShower() {
+  showToast('🚿 去用冷水洗脸！刺激迷走神经降低冲动');
+}
+
+function doDistraction() {
+  const tasks = [
+    '读一页书（推荐《原子习惯》）',
+    '整理你的桌面/房间',
+    '给家人或朋友发一条消息',
+    '学习一项新技能（编程/外语）',
+    '出去散步10分钟',
+    '写一段代码',
+    '整理今天的待办事项',
+  ];
+  const task = tasks[Math.floor(Math.random() * tasks.length)];
+  document.getElementById('distractionTask').textContent = task;
+  showToast(`🎯 试试：${task}`);
+  setTimeout(() => {
+    document.getElementById('distractionTask').textContent = '打开推荐任务';
+  }, 5000);
+}
+
+function doBreathing() {
+  showToast('🌬️ 开始4-7-8呼吸：吸气4秒 → 屏息7秒 → 呼气8秒，重复5次');
+  // 切换到计时器页面进行引导
+  setTimerDuration(300);
+  switchTab('timer');
+  setTimeout(() => startTimer(), 500);
+}
+
+function doJournalUrge() {
+  document.getElementById('urgeModal').classList.add('show');
+  document.getElementById('urgeTrigger').value = '';
+  document.getElementById('urgeIntensity').value = 5;
+  document.getElementById('intensityDisplay').textContent = '5';
+  document.getElementById('urgeNotes').value = '';
+}
+
+document.getElementById('urgeIntensity').addEventListener('input', function() {
+  document.getElementById('intensityDisplay').textContent = this.value;
+});
+
+function closeUrgeModal() {
+  document.getElementById('urgeModal').classList.remove('show');
+}
+
+function saveUrgeLog() {
+  appData = loadData();
+  const log = {
+    date: todayStr(),
+    trigger: document.getElementById('urgeTrigger').value || '未指定',
+    intensity: parseInt(document.getElementById('urgeIntensity').value),
+    notes: document.getElementById('urgeNotes').value || '',
+  };
+  appData.urgeLogs.push(log);
+  saveData(appData);
+  closeUrgeModal();
+  showToast('冲动日志已保存。了解触发模式是改变的第一步 📊');
+  checkAndUnlockAchievements();
+  refreshAchievements();
+}
+
+// ==================== 心理学知识库 ====================
+const knowledgeBase = [
+  {
+    id: 'k1',
+    title: '🧠 神经可塑性与成瘾',
+    preview: '大脑具有惊人的可塑性——每一次行为选择都在物理层面重塑你的神经回路...',
+    content: `<h3>🧠 神经可塑性与成瘾</h3>
+    <p>大脑并非一成不变的硬件，而是持续重组的动态网络。<strong>神经可塑性（Neuroplasticity）</strong>是20世纪神经科学最伟大的发现之一。</p>
+    
+    <div class="highlight-box">
+      <strong>核心原理：</strong>"Neurons that fire together, wire together."<br>
+      —— 一起放电的神经元会连接在一起（Hebb定律）
+    </div>
+    
+    <p><strong>成瘾的神经机制：</strong></p>
+    <ul>
+      <li>多巴胺系统：性行为/手淫触发大量多巴胺释放，形成强烈的奖励回路</li>
+      <li>前额叶皮层：负责自控力的脑区，长期过度刺激会削弱其功能</li>
+      <li>杏仁核：情绪中枢，与冲动控制密切相关</li>
+    </ul>
+    
+    <p><strong>好消息是：</strong>每一次你选择不屈服于冲动，你的大脑就在强化前额叶的控制回路，削弱冲动的自动反应回路。这就是"用进废退"原理。</p>
+    
+    <div class="highlight-box">
+      <strong>关键数据：</strong>研究表明，持续90天的行为改变可以显著重塑神经回路，建立新的默认反应模式。
+    </div>`
+  },
+  {
+    id: 'k2',
+    title: '🌊 冲动冲浪技术详解',
+    preview: '这是基于正念的成瘾干预核心技术——你不是在"对抗"冲动，而是学会"驾驭"它...',
+    content: `<h3>🌊 冲动冲浪（Urge Surfing）技术详解</h3>
+    <p>冲动冲浪由心理学家 <strong>Alan Marlatt</strong> 开发，是基于正念的成瘾预防复发核心技术。</p>
+    
+    <div class="highlight-box">
+      <strong>核心洞见：</strong>冲动像海浪——它来势汹汹，但<strong>必定会消退</strong>。绝大多数冲动的峰值只持续10-20分钟。
+    </div>
+    
+    <p><strong>四步冲浪法：</strong></p>
+    <ol>
+      <li><strong>觉察 Notice：</strong>注意到冲动的出现，给它命名——"这是一个冲动"</li>
+      <li><strong>观察 Observe：</strong>观察身体感受：心跳加速？肌肉紧张？呼吸变浅？不做评判，只是观察</li>
+      <li><strong>呼吸 Breathe：</strong>将注意力带到呼吸上，用深长的呼吸锚定注意力</li>
+      <li><strong>扩展 Expand：</strong>扩展觉知到全身，意识到冲动只是你体验的一部分，而非全部</li>
+    </ol>
+    
+    <div class="highlight-box">
+      <strong>实践要点：</strong>不要"对抗"冲动，对抗只会增加焦虑。像冲浪者一样，你不需要阻止海浪，只需要学会在浪头上保持平衡。
+    </div>`
+  },
+  {
+    id: 'k3',
+    title: '🔄 习惯循环与替换策略',
+    preview: '查尔斯·都希格的"习惯循环"模型揭示：要改变一个习惯，关键是识别并替换惯常行为...',
+    content: `<h3>🔄 习惯循环与替换策略</h3>
+    <p>查尔斯·都希格（Charles Duhigg）在《习惯的力量》中提出：每个习惯由<strong>暗示→惯常行为→奖励</strong>三个环节组成。</p>
+    
+    <div class="highlight-box">
+      <strong>习惯回路：</strong>暗示（触发）→ 惯常行为 → 奖励 → 强化循环
+    </div>
+    
+    <p><strong>黄金法则：</strong>要改变习惯，<strong>保留相同的暗示和奖励，但替换惯常行为</strong>。</p>
+    
+    <p><strong>静心自律应用示例：</strong></p>
+    <ul>
+      <li><strong>暗示识别：</strong>是深夜独处？社交媒体浏览？压力大？无聊？</li>
+      <li><strong>行为替换：</strong>当暗示出现时，立即执行替代行为（运动、冷水洗脸、冥想）</li>
+      <li><strong>奖励保持：</strong>替代行为也能带来放松/满足感（内啡肽而非多巴胺冲击）</li>
+    </ul>
+    
+    <div class="highlight-box">
+      <strong>关键策略：</strong>提前制定"如果-那么"计划（Implementation Intention）——"如果我在深夜感到冲动，那么我会立即做20个俯卧撑并洗冷水脸"
+    </div>`
+  },
+  {
+    id: 'k4',
+    title: '📉 多巴胺戒断：重置奖励系统',
+    preview: '过度刺激导致多巴胺受体下调——你需要的刺激越来越多，获得的快感却越来越少...',
+    content: `<h3>📉 多巴胺戒断：重置奖励系统</h3>
+    <p><strong>多巴胺受体下调（Downregulation）</strong>是成瘾的核心机制。当大脑长期暴露于过量多巴胺时，会减少受体数量进行补偿。</p>
+    
+    <div class="highlight-box">
+      <strong>结果：</strong>需要更多刺激才能获得相同水平的快感，同时对日常生活的愉悦变得麻木。
+    </div>
+    
+    <p><strong>戒断的科学意义：</strong></p>
+    <ul>
+      <li><strong>前2周：</strong>戒断反应最强，焦虑/烦躁/强烈渴望——这是多巴胺受体开始上调的信号</li>
+      <li><strong>2-4周：</strong>戒断反应减弱，开始感受到日常生活的愉悦</li>
+      <li><strong>30-90天：</strong>大脑奖励系统逐渐恢复平衡，前额叶控制力增强</li>
+    </ul>
+    
+    <div class="highlight-box">
+      <strong>重要认知：</strong>戒断期的痛苦不是"失去快乐"，而是你的大脑正在修复，是康复的必经过程。每一天的忍耐都是对奖励系统的正向改造。
+    </div>`
+  },
+  {
+    id: 'k5',
+    title: '🏋️ 自控力：像肌肉一样训练',
+    preview: 'Roy Baumeister的研究表明，自控力像肌肉——会疲劳，但也可以被训练增强...',
+    content: `<h3>🏋️ 自控力：像肌肉一样训练</h3>
+    <p>社会心理学家 <strong>Roy Baumeister</strong> 提出的"自我损耗（Ego Depletion）"理论揭示了自控力的核心特性。</p>
+    
+    <div class="highlight-box">
+      <strong>核心发现：</strong>自控力是一种有限的、可消耗的心理资源——但也像肌肉一样可以通过训练增强。
+    </div>
+    
+    <p><strong>自控力训练法则：</strong></p>
+    <ul>
+      <li><strong>从小处开始：</strong>每天做一件小事练习自控（如用非惯用手刷牙），逐步增强自控"肌肉"</li>
+      <li><strong>避免决策疲劳：</strong>减少不必要的选择消耗，把自控力用在刀刃上</li>
+      <li><strong>血糖管理：</strong>自控力消耗葡萄糖，保持血糖稳定有助于维持自控力</li>
+      <li><strong>充足睡眠：</strong>睡眠不足严重削弱前额叶功能，导致自控力下降</li>
+    </ul>
+    
+    <div class="highlight-box">
+      <strong>实用建议：</strong>在你的日常生活中加入自控力训练——准时起床、整理床铺、固定健身时间。这些小胜利会累积成巨大的自控力储备。
+    </div>`
+  },
+  {
+    id: 'k6',
+    title: '🎯 目标设定与SMART原则',
+    preview: '模糊的目标是失败的温床。SMART原则帮你制定真正有效的静心自律目标...',
+    content: `<h3>🎯 目标设定与SMART原则</h3>
+    <p><strong>SMART原则</strong>是目标设定的黄金标准，由George Doran于1981年提出。</p>
+    
+    <div class="highlight-box">
+      <strong>SMART = </strong>Specific（具体的）+ Measurable（可测量的）+ Achievable（可实现的）+ Relevant（相关的）+ Time-bound（有时限的）
+    </div>
+    
+    <p><strong>静心自律目标范例：</strong></p>
+    <ul>
+      <li>❌ 差目标："我要静心自律"</li>
+      <li>✅ SMART目标："我要在未来90天内，将手淫频率从每周4次减少到0次，每天使用冲动冲浪技术应对至少1次冲动，每天写反思日记。"</li>
+    </ul>
+    
+    <div class="highlight-box">
+      <strong>关键技巧：</strong>不要只关注"不做某事"，更要定义"做什么来替代"。把目标分解为每日可执行的最小行动。
+    </div>`
+  },
+  {
+    id: 'k7',
+    title: '🪞 认知行为疗法(CBT)在静心自律中的应用',
+    preview: 'CBT帮你识别和挑战导致冲动行为的自动化思维...',
+    content: `<h3>🪞 认知行为疗法(CBT)在静心自律中的应用</h3>
+    <p><strong>认知行为疗法（CBT）</strong>是目前证据最充分的心理干预方法，其核心是改变<strong>想法→情绪→行为</strong>的链条。</p>
+    
+    <div class="highlight-box">
+      <strong>CBT三角：</strong>想法（Thoughts）↔ 情绪（Emotions）↔ 行为（Behaviors）——三者相互影响
+    </div>
+    
+    <p><strong>静心自律中的常见认知扭曲：</strong></p>
+    <ul>
+      <li><strong>全有或全无思维：</strong>"我已经破戒一次了，今天彻底完了"→ 导致破罐破摔</li>
+      <li><strong>灾难化：</strong>"没有这个我无法放松/入睡"→ 夸大需求的必要性</li>
+      <li><strong>情绪推理：</strong>"我感觉需要，所以这是必须满足的需求"→ 混淆欲望与需求</li>
+    </ul>
+    
+    <div class="highlight-box">
+      <strong>CBT应对策略：</strong>每次冲动出现时，问自己三个问题：<br>
+      1. "这个想法是真的吗？"（认知挑战）<br>
+      2. "最可能发生的结果是什么？"（去灾难化）<br>
+      3. "有没有替代的解释/行为？"（认知重构）
+    </div>`
+  },
+  {
+    id: 'k8',
+    title: '📊 自我监控的力量',
+    preview: '仅仅是追踪行为本身，就能显著改善行为——这就是"自我监控效应"...',
+    content: `<h3>📊 自我监控的力量</h3>
+    <p><strong>自我监控（Self-Monitoring）</strong>是行为改变中最简单却最有效的技术之一。</p>
+    
+    <div class="highlight-box">
+      <strong>核心发现：</strong>仅仅记录和追踪一个行为，就能使该行为发生显著改变——即使没有任何其他干预。这在心理学中被称为"反应性（Reactivity）"效应。
+    </div>
+    
+    <p><strong>为什么有效：</strong></p>
+    <ul>
+      <li>增加行为意识：很多时候我们"自动化"地行动，追踪打破了自动化</li>
+      <li>提供客观反馈：日历上的标记是无可辩驳的数据</li>
+      <li>创造问责感：看到记录本身就是一种温和的自我问责</li>
+      <li>可视化进展：连续天数本身就是强大的动力来源</li>
+    </ul>
+    
+    <div class="highlight-box">
+      <strong>最佳实践：</strong>每天固定时间（如睡前）记录。使用日历热力图（本应用已实现）是最直观的自我监控方式。记住：不要因为一次破戒就停止记录——记录破戒同样重要，它帮助你识别高危情境。
+    </div>`
+  },
+];
+
+function refreshKnowledge() {
+  const listEl = document.getElementById('knowledgeList');
+  listEl.innerHTML = knowledgeBase.map((k, i) => `
+    <div class="knowledge-item" data-id="${k.id}" onclick="showKnowledge('${k.id}')">
+      <div class="ki-title">${k.title}</div>
+      <div class="ki-preview">${k.preview}</div>
+    </div>
+  `).join('');
+}
+
+function showKnowledge(id) {
+  const item = knowledgeBase.find(k => k.id === id);
+  if (!item) return;
+  
+  document.querySelectorAll('.knowledge-item').forEach(el => el.classList.remove('active'));
+  const listItem = document.querySelector(`[data-id="${id}"]`);
+  if (listItem) listItem.classList.add('active');
+  
+  const detailEl = document.getElementById('knowledgeDetail');
+  detailEl.style.display = 'block';
+  detailEl.innerHTML = item.content;
+  detailEl.scrollIntoView({ behavior: 'smooth' });
+}
+
+// ==================== 成就系统 ====================
+function checkAndUnlockAchievements() {
+  appData = loadData();
+  let newUnlocks = false;
+  
+  achievementDefs.forEach(ach => {
+    if (!appData.achievements[ach.id] && ach.condition(appData)) {
+      appData.achievements[ach.id] = true;
+      newUnlocks = true;
+      showToast(`🏆 解锁成就：${ach.name}！`);
+    }
+  });
+  
+  if (newUnlocks) {
+    saveData(appData);
+    showConfetti();
+  }
+}
+
+function refreshAchievements() {
+  appData = loadData();
+  const grid = document.getElementById('achievementGrid');
+  
+  grid.innerHTML = achievementDefs.map(ach => {
+    const unlocked = !!appData.achievements[ach.id];
+    return `
+      <div class="achievement-item ${unlocked ? 'unlocked' : 'locked'}">
+        <div class="achievement-icon">${ach.icon}</div>
+        <div class="achievement-name">${ach.name}</div>
+        <div class="achievement-desc">${ach.desc}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ==================== 数据分析 ====================
+function refreshAnalytics() {
+  appData = loadData();
+  
+  // 月度趋势图
+  const monthlyData = {};
+  const today = new Date();
+  
+  // 过去6个月
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    monthlyData[key] = 0;
+  }
+  
+  Object.keys(appData.cleanDays).forEach(ds => {
+    const key = ds.substring(0, 7);
+    if (monthlyData.hasOwnProperty(key) && !appData.resetDays[ds]) {
+      monthlyData[key]++;
+    }
+  });
+  
+  const maxDays = Math.max(1, ...Object.values(monthlyData));
+  const monthNames = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+  
+  const chartEl = document.getElementById('monthlyChart');
+  chartEl.innerHTML = Object.entries(monthlyData).map(([key, val]) => {
+    const [y, m] = key.split('-');
+    const pct = Math.round(val / 30 * 100);
+    return `
+      <div class="chart-bar">
+        <div class="chart-bar-label">${monthNames[parseInt(m)-1]}</div>
+        <div class="chart-bar-track">
+          <div class="chart-bar-fill" style="width:${Math.max(pct,5)}%;background:linear-gradient(90deg,#4A90D9,#00B4D8);">
+            ${val}天
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+  
+  // 统计概览
+  const totalClean = Object.keys(appData.cleanDays).length;
+  const totalReset = Object.keys(appData.resetDays).length;
+  const totalDays = totalClean + totalReset;
+  const successRate = totalDays > 0 ? Math.round(totalClean / totalDays * 100) : 0;
+  const urgeLogCount = appData.urgeLogs.length;
+  const journalCount = Object.keys(appData.journals).length;
+  const bestStreak = appData.bestStreak || 0;
+  const currentStreak = getCurrentStreak(appData);
+  
+  // 冲动触发因素统计
+  const triggerStats = {};
+  appData.urgeLogs.forEach(log => {
+    triggerStats[log.trigger] = (triggerStats[log.trigger] || 0) + 1;
+  });
+  const topTriggers = Object.entries(triggerStats)
+    .sort((a,b) => b[1]-a[1])
+    .slice(0, 5);
+  
+  const statsEl = document.getElementById('statsOverview');
+  statsEl.innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px;">
+      <div style="text-align:center;padding:16px;background:var(--bg);border-radius:10px;">
+        <div style="font-size:28px;font-weight:700;color:var(--success);">${successRate}%</div>
+        <div style="font-size:12px;color:var(--text-light);">自律成功率</div>
+      </div>
+      <div style="text-align:center;padding:16px;background:var(--bg);border-radius:10px;">
+        <div style="font-size:28px;font-weight:700;color:var(--primary);">${currentStreak}</div>
+        <div style="font-size:12px;color:var(--text-light);">当前连续(天)</div>
+      </div>
+      <div style="text-align:center;padding:16px;background:var(--bg);border-radius:10px;">
+        <div style="font-size:28px;font-weight:700;color:var(--warning);">${bestStreak}</div>
+        <div style="font-size:12px;color:var(--text-light);">最佳记录(天)</div>
+      </div>
+      <div style="text-align:center;padding:16px;background:var(--bg);border-radius:10px;">
+        <div style="font-size:28px;font-weight:700;color:var(--accent);">${journalCount}</div>
+        <div style="font-size:12px;color:var(--text-light);">累计日记</div>
+      </div>
+    </div>
+    ${topTriggers.length > 0 ? `
+      <div class="card-title"><span class="icon">⚠️</span> 最常见的触发因素</div>
+      ${topTriggers.map(([t,c]) => `
+        <div class="chart-bar">
+          <div class="chart-bar-label" style="width:120px;">${t}</div>
+          <div class="chart-bar-track">
+            <div class="chart-bar-fill" style="width:${Math.round(c/Math.max(...topTriggers.map(x=>x[1]))*100)}%;background:linear-gradient(90deg,#F39C12,#E74C3C);">
+              ${c}次
+            </div>
+          </div>
+        </div>
+      `).join('')}
+    ` : '<p style="color:var(--text-light);">记录冲动日志后，这里会显示最常见的触发因素</p>'}
+  `;
+}
+
+// ==================== 初始化 ====================
+function init() {
+  refreshDashboard();
+  refreshCheckin();
+  refreshCalendar();
+  refreshKnowledge();
+  refreshAchievements();
+  refreshAnalytics();
+  updateTimerDisplay();
+  
+  // 每天打开时自动检查里程碑
+  checkAndUnlockAchievements();
+  
+  // 如果当前有URL hash指向特定tab，自动切换
+  const hash = window.location.hash.replace('#', '');
+  if (hash && document.querySelector(`[data-tab="${hash}"]`)) {
+    switchTab(hash);
+  }
+  
+  // 如果是当天的第一次访问（通过检查lastCheckin）
+  const today = todayStr();
+  if (appData.lastCheckin !== today) {
+    // 新的一天，可以展示欢迎消息
+    const streak = getCurrentStreak(appData);
+    if (streak >= 3) {
+      setTimeout(() => showToast(`欢迎回来！当前连续 ${streak} 天 🔥`), 1000);
+    }
+  }
+}
+
+// 页面离开时保存
+window.addEventListener('beforeunload', () => {
+  appData.lastCheckin = todayStr();
+  saveData(appData);
+});
+
+// 初始化
+init();
+</script>
+
+</body>
+</html>
