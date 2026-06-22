@@ -35,9 +35,11 @@
 ### 方法三：开机自启动 ⭐
 
 **自动配置（推荐）：**
-1. 右键 `setup_startup.bat` → 以管理员身份运行
+1. 双击 `setup_startup.bat`（无需管理员权限）
 2. 按提示完成即可
 3. 下次开机自动启动
+
+> 💡 如果双击失效，可右键 `setup_startup.ps1` → 使用 PowerShell 运行
 
 **手动配置：**
 1. `Win+R` → 输入 `shell:startup` → 回车
@@ -124,3 +126,14 @@
 - 数据存储在浏览器的 localStorage
 - 支持所有现代浏览器（Chrome/Edge/Firefox/Safari）
 - 响应式设计，支持手机和电脑
+
+### 开机自启相关文件
+
+| 文件 | 说明 |
+|------|------|
+| `setup_startup.bat` | 启动器（双击即可） |
+| `setup_startup.ps1` | 核心设置脚本（PowerShell） |
+| `get_startup_folder.ps1` | 用户路径定位辅助脚本 |
+| `startup.vbs` | 静默启动脚本（用默认浏览器打开 index.html） |
+
+> ⚠️ 开机自启**不需要管理员权限**，脚本会自动定位当前登录用户的启动文件夹。
