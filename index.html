@@ -850,13 +850,15 @@ body {
       </div>
       <div style="text-align:center;">
         <div style="width:80px;height:80px;border-radius:50%;background:var(--primary);margin:0 auto;
-          transition: transform 4s ease-in-out;animation: breatheAnim 8s ease-in-out infinite;
+          transition: transform 4s ease-in-out;animation: breatheAnim 19s ease-in-out infinite;
           opacity:0.3;" id="breathingCircle"></div>
       </div>
       <style>
         @keyframes breatheAnim {
-          0%, 100% { transform: scale(0.6); }
-          50% { transform: scale(1.8); }
+          0%   { transform: scale(1.0); }   /* 开始吸气 */
+          21%  { transform: scale(1.8); }   /* 吸气4秒完成（4/19≈21%） */
+          58%  { transform: scale(1.8); }   /* 屏息7秒保持（11/19≈58%） */
+          100% { transform: scale(1.0); }   /* 呼气8秒完成 */
         }
       </style>
     </div>
@@ -1362,15 +1364,15 @@ function startTimer() {
     timerSeconds--;
     updateTimerDisplay();
     
-    // 呼吸引导
-    const phase = timerSeconds % 8;
+    // 呼吸引导：4-7-8呼吸法（吸气4秒+屏息7秒+呼气8秒=19秒周期）
+    const phase = timerSeconds % 19;
     const breathingEl = document.getElementById('breathingText');
     if (phase < 4) {
       breathingEl.textContent = '吸气... ' + (4-phase) + '秒';
-    } else if (phase < 7) {
-      breathingEl.textContent = '屏息... ' + (7-phase) + '秒';
+    } else if (phase < 11) {
+      breathingEl.textContent = '屏息... ' + (11-phase) + '秒';
     } else {
-      breathingEl.textContent = '呼气... ' + (8-phase) + '秒';
+      breathingEl.textContent = '呼气... ' + (19-phase) + '秒';
     }
     
     if (timerSeconds <= 0) {

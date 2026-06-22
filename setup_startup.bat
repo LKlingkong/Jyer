@@ -14,6 +14,7 @@ set "STARTUP_FOLDER=%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup"
 set "SCRIPT_DIR=%~dp0"
 set "VBS_PATH=%SCRIPT_DIR%startup.vbs"
 set "SHORTCUT_NAME=静心自律.lnk"
+set "SHORTCUT_FULL=%STARTUP_FOLDER%\%SHORTCUT_NAME%"
 
 echo 启动文件夹: %STARTUP_FOLDER%
 echo 脚本路径: %VBS_PATH%
@@ -27,18 +28,35 @@ if not exist "%VBS_PATH%" (
     exit /b 1
 )
 
-REM 创建VBS脚本来创建快捷方式
-set "CREATE_SHORTCUT=%TEMP%\create_shortcut.vbs"
-echo Set WshShell = CreateObject("WScript.Shell") > "%CREATE_SHORTCUT%"
-echo Set Shortcut = WshShell.CreateShortcut("%STARTUP_FOLDER%\%SHORTCUT_NAME%") >> "%CREATE_SHORTCUT%"
-echo Shortcut.TargetPath = "%VBS_PATH%" >> "%CREATE_SHORTCUT%"
-echo Shortcut.WorkingDirectory = "%SCRIPT_DIR%" >> "%CREATE_SHORTCUT%"
-echo Shortcut.Description = "静心自律 - 科学行为管理助手" >> "%CREATE_SHORTCUT%"
-echo Shortcut.IconLocation = "shell32.dll,14" >> "%CREATE_SHORTCUT%"
-echo Shortcut.Save >> "%CREATE_SHORTCUT%"
+REM 确保启动文件夹存在
+if not exist "%STARTUP_FOLDER%" (
+    mkdir "%STARTUP_FOLDER%" 2>nul
+)
 
-cscript //nologo "%CREATE_SHORTCUT%"
-del "%CREATE_SHORTCUT%"
+REM 使用PowerShell创建快捷方式（兼容性更好，处理空格路径更可靠）
+powershell -ExecutionPolicy Bypass -Command ^
+"$startup = [Environment]::GetEnvironmentVariable('STARTUP_FOLDER','Process');" ^
+"$vbs = [Environment]::GetEnvironmentVariable('VBS_PATH','Process');" ^
+"$dir = [Environment]::GetEnvironmentVariable('SCRIPT_DIR','Process');" ^
+"$name = [Environment]::GetEnvironmentVariable('SHORTCUT_NAME','Process');" ^
+"$linkPath = Join-Path $startup $name;" ^
+"$ws = New-Object -ComObject WScript.Shell;" ^
+"$sc = $ws.CreateShortcut($linkPath);" ^
+"$sc.TargetPath = $vbs;" ^
+"$sc.WorkingDirectory = $dir;" ^
+"$sc.Description = '静心自律 - 科学行为管理助手';" ^
+"$sc.IconLocation = 'shell32.dll,14';" ^
+"$sc.Save();" ^
+"if (Test-Path $linkPath) { Write-Host 'OK' } else { throw 'Failed to create shortcut' }"
+
+if %ERRORLEVEL% NEQ 0 (
+    echo.
+    echo [错误] 创建快捷方式失败！
+    echo 请尝试：右键此文件 → "以管理员身份运行"
+    echo.
+    pause
+    exit /b 1
+)
 
 echo.
 echo ============================================
@@ -49,6 +67,6 @@ echo 快捷方式已创建到启动文件夹。
 echo 下次开机时，静心自律程序将自动打开。
 echo.
 echo 如需取消：删除以下文件即可
-echo   %STARTUP_FOLDER%\%SHORTCUT_NAME%
+echo   %SHORTCUT_FULL%
 echo.
 pause
