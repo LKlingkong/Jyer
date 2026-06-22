@@ -1,4 +1,4 @@
-# Get the correct Startup folder for the actual logged-in user.
+﻿# Get the correct Startup folder for the actual logged-in user.
 # Fixes the issue where running as Administrator causes
 # %APPDATA% to point to the Admin account instead of the real user.
 
